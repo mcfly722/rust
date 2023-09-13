@@ -1,5 +1,6 @@
 extern crate crossbeam;
 use std::io::Write;
+use std::time::Instant;
 
 mod image;
 mod parse;
@@ -30,7 +31,9 @@ fn main() {
 
     //render::render(&mut pixels, bounds, upper_left, lower_right);
 
-    let threads = 1024;
+    let start = Instant::now();
+
+    let threads = 32;
     let rows_per_band = bounds.1 / threads + 1;
     {
         let bands: Vec<&mut [u8]> = pixels.chunks_mut(rows_per_band * bounds.0).collect();
@@ -53,6 +56,9 @@ fn main() {
             }
         });
     }
+
+    let duration = start.elapsed();
+    println!("Time elapsed in render is: {:?}", duration);
 
     image::write_image(&args[1], &pixels, bounds).expect("ошибка при записи PNG-файла");
 }
