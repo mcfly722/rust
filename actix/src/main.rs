@@ -26,7 +26,7 @@ Requests/sec:  91044.76
 Transfer/sec:     10.77MB
 
 */
-use actix_web::{web, Responder, middleware, App, HttpServer};
+use actix_web::{middleware, web, App, HttpServer, Responder};
 
 async fn health_check() -> impl Responder {
     "Welcome!"
@@ -38,12 +38,11 @@ fn routes(cfg: &mut web::ServiceConfig) {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let serv = HttpServer::new(move || {
+    let server = HttpServer::new(move || {
         App::new()
             .wrap(middleware::Compress::default())
             .configure(routes)
     });
-    serv.bind("127.0.0.1:8080")?
-        .run()
-        .await
+
+    server.bind("127.0.0.1:8080")?.run().await
 }
